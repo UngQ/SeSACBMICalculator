@@ -23,7 +23,7 @@ class ViewController: UIViewController {
     @IBOutlet var resultButton: UIButton!
     
     //BMI = 몸무게 / 키^2
-    
+        
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -48,8 +48,8 @@ class ViewController: UIViewController {
     }
     
     @IBAction func randomResultButtonClicked(_ sender: UIButton) {
-        let randomHeight = Float.random(in: 120...250)
-        let randomWeight = Float.random(in: 40...150)
+        let randomHeight = Double.random(in: 120...250)
+        let randomWeight = Double.random(in: 40...150)
         
         heightTextField.text = String(format: "%.2f", randomHeight)
         weightTextField.text = String(format: "%.2f", randomWeight)
@@ -64,11 +64,12 @@ class ViewController: UIViewController {
         
         // 위 처럼 텍스트필드 텍스트를 guard let 옵셔널 언래핑을 한번 더 해주려다가
         // 텍스트필드 텍스트는 nil값을 자동으로 처리해주는 기능이 있어서 오류 발생 확률이 없다 생각하여 강제언래핑으로 변경해보았습니다
-        guard let floatHeight = Float(heightTextField.text!) else { return "정확한 키를 입력하시오."}
-        guard let floatWeight = Float(weightTextField.text!) else { return "정확한 몸무게를 입력하시오."}
+        guard let doubleHeight = Double(heightTextField.text!) else { return "정확한 키를 입력하시오."}
+        guard let doubleWeight = Double(weightTextField.text!) else { return "정확한 몸무게를 입력하시오."}
         
-        let bmiValue = floatWeight / (floatHeight / 100 * floatHeight / 100)
+        let bmiValue = doubleWeight / (doubleHeight / 100 * doubleHeight / 100)
         let stringBMIValue = String(format: "%.2f", bmiValue)
+
         var bmiResult: String
         
         switch bmiValue {
@@ -86,9 +87,9 @@ class ViewController: UIViewController {
             bmiResult = "오류"
         }
         
-        switch floatHeight {
+        switch doubleHeight {
         case 120...250:
-            switch floatWeight {
+            switch doubleWeight {
             case 40...150:
                 return "\(bmiResult) (\(stringBMIValue))"
             default:
@@ -98,7 +99,6 @@ class ViewController: UIViewController {
             return "키를 120이상 250이하로 입력하세요."
         }
     }
-    
     
     func designTotalView() {
         
@@ -127,6 +127,9 @@ class ViewController: UIViewController {
         resultButton.tintColor = .white
         resultButton.backgroundColor = .purple
         resultButton.layer.cornerRadius = 10
+        
+        weightTextField.keyboardType = .numbersAndPunctuation
+        heightTextField.keyboardType = .numbersAndPunctuation
     }
 }
 
