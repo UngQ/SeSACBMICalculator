@@ -46,18 +46,15 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         
         inputSavedTextFieldDate()
-        updatedSubTitleLable(nicknameText: savedNickname)
+        updatedSubTitleLable()
         designTotalView()
-        
     }
     
     @IBAction func editingTextField(_ sender: UITextField) {
         trimmingTextField(textfield: sender)
-        updatedSubTitleLable(nicknameText: nicknameTextField.text)
+        updatedSubTitleLable()
     }
 
-    
-    
     @IBAction func tapGestureClicked(_ sender: UITapGestureRecognizer) {
         view.endEditing(true)
     }
@@ -77,21 +74,49 @@ class ViewController: UIViewController {
     
     @IBAction func randomResultButtonClicked(_ sender: UIButton) {
         inputRandomValues()
-        updatedSubTitleLable(nicknameText: nicknameTextField.text)
+        updatedSubTitleLable()
     }
     
     @IBAction func resetButtonClicked(_ sender: UIButton) {
 
-        nicknameTextField.text = nil
-        heightTextField.text = nil
-        weightTextField.text = nil
+        nicknameTextField.text = ""
+        heightTextField.text = ""
+        weightTextField.text = ""
         
+    
         UserDefaults.standard.set("", forKey: "nickname")
         UserDefaults.standard.set("0", forKey: "height")
         UserDefaults.standard.set("0", forKey: "weight")
 
-        updatedSubTitleLable(nicknameText: nicknameTextField.text)
+        updatedSubTitleLable()
         resetAlert()
+    }
+    
+    func inputSavedTextFieldDate() {
+        if let savedNickname {
+            nicknameTextField.text = savedNickname
+        } else {
+            nicknameTextField.text = ""
+        }
+        
+        if Double(savedHeight ?? "0") == 0 {
+            heightTextField.text = ""
+        } else {
+            heightTextField.text = savedHeight
+        }
+        if Double(savedWeight ?? "0") == 0 {
+            weightTextField.text = ""
+        } else {
+            weightTextField.text = savedWeight
+        }
+    }
+    
+    func updatedSubTitleLable() {
+        if nicknameTextField.text == "" {
+            subTitleLabel.text = "당신의 BMI 지수를\n알려드릴게요."
+        } else {
+            subTitleLabel.text = "\(nicknameTextField.text!)의 BMI 지수를\n알려드릴게요."
+        }
     }
     
     func inputRandomValues() {
@@ -106,8 +131,15 @@ class ViewController: UIViewController {
         
         //viewdidload에서 inputSavedTextFieldDate() 통하여
         //초기 nil값들을 잡아줌
-        if nicknameTextField.text == "" {
-            return "닉네임을 입력하시오."
+        
+        
+//        if nicknameTextField.text == "" {
+//            return "닉네임을 입력하시오."
+//        }
+        //통일성을 위해 가드문으로 변경
+        
+        guard nicknameTextField.text != "" else {
+            return "닉네임을 입력하시오"
         }
         // 텍스트필드 텍스트는 nil값을 자동으로 처리해주는 기능이 있어서 오류 발생 확률이 없다 생각하여 강제언래핑으로 변경해보았습니다
         guard let doubleHeight = Double(heightTextField.text!) else {
@@ -132,7 +164,6 @@ class ViewController: UIViewController {
     }
     
     func judgeBMI(stringBMIValue: String) -> String {
-    
         let result = Double(stringBMIValue) ?? 0
         switch result {
         case 1..<18.5:
@@ -148,6 +179,27 @@ class ViewController: UIViewController {
         default:
             return ""
         }
+    }
+
+    func resultAlert() {
+        let bmiResult = calculatorBMI()
+        let judgeBMI = judgeBMI(stringBMIValue: bmiResult)
+        
+        let alert = UIAlertController(title: "BMI 지수결과", message: "\(judgeBMI) \(bmiResult)", preferredStyle: .alert)
+        let alertCancleButton = UIAlertAction(title: "확인", style: .cancel)
+        alert.addAction(alertCancleButton)
+        present(alert, animated: true)
+    }
+    
+    func resetAlert() {
+        let alert = UIAlertController(title: "데이터 리셋 완료", message: .none, preferredStyle: .alert)
+        let alertCancleButton = UIAlertAction(title: "확인", style: .cancel)
+        alert.addAction(alertCancleButton)
+        present(alert, animated: true)
+    }
+    
+    func trimmingTextField(textfield: UITextField) {
+        textfield.text = textfield.text?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
     }
     
     func designTotalView() {
@@ -188,53 +240,6 @@ class ViewController: UIViewController {
         
         weightTextField.keyboardType = .numbersAndPunctuation
         heightTextField.keyboardType = .numbersAndPunctuation
-    }
-    
-    func inputSavedTextFieldDate() {
-        if let savedNickname {
-            nicknameTextField.text = savedNickname
-        } else {
-            nicknameTextField.text = ""
-        }
-        
-        if Double(savedHeight ?? "0") == 0 {
-            heightTextField.text = ""
-        } else {
-            heightTextField.text = savedHeight
-        }
-        if Double(savedWeight ?? "0") == 0 {
-            weightTextField.text = ""
-        } else {
-            weightTextField.text = savedWeight
-        }
-    }
-    
-    func updatedSubTitleLable(nicknameText: String?) {
-        if nicknameText == "" {
-            subTitleLabel.text = "당신의 BMI 지수를\n알려드릴게요."
-        } else {
-            subTitleLabel.text = "\(nicknameText ?? "당신")의 BMI 지수를\n알려드릴게요."
-        }
-    }
-    
-    func resultAlert() {
-        let bmiResult: String = calculatorBMI()
-        let judgeBMI = judgeBMI(stringBMIValue: bmiResult)
-        let alert = UIAlertController(title: "BMI 지수결과", message: "\(judgeBMI) \(bmiResult)", preferredStyle: .alert)
-        let alertCancleButton = UIAlertAction(title: "확인", style: .cancel)
-        alert.addAction(alertCancleButton)
-        present(alert, animated: true)
-    }
-    
-    func resetAlert() {
-        let alert = UIAlertController(title: "데이터 리셋 완료", message: .none, preferredStyle: .alert)
-        let alertCancleButton = UIAlertAction(title: "확인", style: .cancel)
-        alert.addAction(alertCancleButton)
-        present(alert, animated: true)
-    }
-    
-    func trimmingTextField(textfield: UITextField) {
-        textfield.text = textfield.text?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
     }
     
 }
